@@ -443,29 +443,42 @@
         </div>
     </div>
 
-    <script src="https://unpkg.com/@supabase/supabase-js@2.39.0/dist/umd/supabase.js"></script>
+    <script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
     <script>
         // ⚠️ REPLACE THESE WITH YOUR ACTUAL SUPABASE CREDENTIALS ⚠️
         const SUPABASE_URL = 'https://frwtmvicerolhnseavat.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZyd3RtdmljZXJvbGhuc2VhdmF0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk5NDY3MjksImV4cCI6MjA2NTUyMjcyOX0.r0ldPbNANCrE-vaXuCnyixoFl8G8noil7lOoK85mM-0';
         
-        // Initialize Supabase client
-        let supabase;
-        try {
-            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        } catch (error) {
-            console.log('Supabase not connected - using demo mode');
-        }
-        // Test connection
-            async function testSupabase() {
+        // Initialize Supabase client with better error handling
+        let supabase = null;
+        
+        // Wait for DOM and try multiple ways to load Supabase
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
                 try {
-                    const { data, error } = await supabase.from('quit_tracking').select('count');
-                    console.log('Supabase test result:', { data, error });
-                } catch (err) {
-                    console.error('Supabase test failed:', err);
+                    // Try different ways Supabase might be available
+                    if (window.supabase && window.supabase.createClient) {
+                        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                        console.log('✅ Supabase connected via window.supabase!');
+                    } else if (window.Supabase && window.Supabase.createClient) {
+                        supabase = window.Supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                        console.log('✅ Supabase connected via window.Supabase!');
+                    } else if (typeof createClient !== 'undefined') {
+                        supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                        console.log('✅ Supabase connected via global createClient!');
+                    } else {
+                        console.log('❌ Supabase library not loaded - using demo mode');
+                        console.log('Available on window:', Object.keys(window).filter(k => k.toLowerCase().includes('supabase')));
+                    }
+                } catch (error) {
+                    console.error('❌ Supabase connection error:', error);
+                    console.log('Using demo mode');
                 }
-            }
-            testSupabase();
+                
+                // Set default quit date to today
+                document.getElementById('quitDate').valueAsDate = new Date();
+            }, 100); // Small delay to let Supabase load
+        });
 
         const motivationalQuotes = [
             "Every moment you resist is a victory. You're stronger than any craving!",
