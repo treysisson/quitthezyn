@@ -367,7 +367,7 @@
                     <input type="number" id="zynsPerPack" placeholder="e.g., 15" min="1" required>
                 </div>
                 
-                <button class="start-btn" onclick="startTracking()">Start My Journey! 🚀</button>
+                <button class="start-btn" onclick="startTracking(); return false;">Start My Journey! 🚀</button>
                 
                 <div style="margin-top: 20px; opacity: 0.8; font-size: 0.9rem;">
                     <p>Already started? <button class="reset-btn" onclick="loadExistingUser()" style="display: inline; margin: 0; padding: 5px 10px;">Load My Progress</button></p>
@@ -580,13 +580,18 @@
                 costPerZyn: costPerPack / zynsPerPack
             };
 
+            console.log('✅ Saving data to Supabase...');
+            
             // Save to Supabase
             const result = await saveUserData(quitData);
+            console.log('Save result:', result);
+            
             if (!result.success) {
                 alert('Error saving your data. Please try again.');
                 return;
             }
 
+            console.log('✅ Data saved successfully!');
             currentUser = userName;
             document.getElementById('currentUserName').textContent = userName;
             
