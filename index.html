@@ -496,20 +496,46 @@
             }
 
             try {
-                const { data, error } = await supabase
+                // First check if user exists
+                const { data: existingData, error: checkError } = await supabase
                     .from('quit_tracking')
-                    .upsert({
-                        user_name: userData.userName,
-                        quit_date: userData.quitDate.toISOString().split('T')[0],
-                        daily_usage: userData.dailyUsage,
-                        cost_per_pack: userData.costPerPack,
-                        zyns_per_pack: userData.zynsPerPack
-                    }, {
-                        onConflict: 'user_name'
-                    });
+                    .select('id')
+                    .eq('user_name', userData.userName)
+                    .single();
 
-                if (error) throw error;
-                return { success: true, data };
+                if (checkError && checkError.code !== 'PGRST116') {
+                    throw checkError;
+                }
+
+                if (existingData) {
+                    // Update existing user
+                    const { data, error } = await supabase
+                        .from('quit_tracking')
+                        .update({
+                            quit_date: userData.quitDate.toISOString().split('T')[0],
+                            daily_usage: userData.dailyUsage,
+                            cost_per_pack: userData.costPerPack,
+                            zyns_per_pack: userData.zynsPerPack
+                        })
+                        .eq('user_name', userData.userName);
+
+                    if (error) throw error;
+                    return { success: true, data };
+                } else {
+                    // Insert new user
+                    const { data, error } = await supabase
+                        .from('quit_tracking')
+                        .insert({
+                            user_name: userData.userName,
+                            quit_date: userData.quitDate.toISOString().split('T')[0],
+                            daily_usage: userData.dailyUsage,
+                            cost_per_pack: userData.costPerPack,
+                            zyns_per_pack: userData.zynsPerPack
+                        });
+
+                    if (error) throw error;
+                    return { success: true, data };
+                }
             } catch (error) {
                 console.error('Error saving data:', error);
                 return { success: false, error };
@@ -708,21 +734,73 @@
         }
 
         function toggleCopingStrategies() {
+            console.log('🚨 Get Help Now button clicked!');
+            
             const strategies = document.getElementById('copingStrategies');
-            strategies.style.display = strategies.style.display === 'none' ? 'block' : 'none';
+            
+            if (!strategies) {
+                console.error('❌ Coping strategies element not found!');
+                return;
+            }
+            
+            console.log('📊 Current element state:');
+            console.log('  - style.display:', strategies.style.display);
+            console.log('  - computed display:', window.getComputedStyle(strategies).display);
+            console.log('  - offsetHeight:', strategies.offsetHeight);
+            console.log('  - offsetWidth:', strategies.offsetWidth);
+            
+            // More reliable way to check if it's hidden
+            const isCurrentlyHidden = window.getComputedStyle(strategies).display === 'none' || 
+                                    strategies.offsetHeight === 0;
+            
+            console.log('  - isCurrentlyHidden:', isCurrentlyHidden);
+            
+            if (isCurrentlyHidden) {
+                console.log('🔄 Showing coping strategies...');
+                strategies.style.display = 'block';
+            } else {
+                console.log('🔄 Hiding coping strategies...');
+                strategies.style.display = 'none';
+            }
+            
+            // Verify the change worked
+            setTimeout(() => {
+                const newDisplay = window.getComputedStyle(strategies).display;
+                const newHeight = strategies.offsetHeight;
+                console.log('✅ After toggle:');
+                console.log('  - new display:', newDisplay);
+                console.log('  - new height:', newHeight);
+                
+                if (newHeight === 0 && !isCurrentlyHidden) {
+                    console.warn('⚠️ Toggle may have failed - element is still hidden');
+                } else if (newHeight > 0 && isCurrentlyHidden) {
+                    console.log('🎉 Successfully showed strategies!');
+                } else if (newHeight === 0 && isCurrentlyHidden) {
+                    console.log('🎉 Successfully hid strategies!');
+                }
+            }, 50);
         }
 
         function selectStrategy(element) {
+            console.log('🎯 Strategy selected:', element.textContent.trim());
+            console.log('📊 Element before styling:');
+            console.log('  - current background:', element.style.background);
+            console.log('  - current transform:', element.style.transform);
+            
             element.style.background = 'rgba(76, 175, 80, 0.3)';
             element.style.transform = 'scale(1.05)';
             
+            console.log('✅ Applied success styling');
+            
             setTimeout(() => {
+                console.log('🔄 Reverting to hover state...');
                 element.style.background = 'rgba(255, 255, 255, 0.1)';
                 element.style.transform = 'translateX(5px)';
             }, 1000);
 
             setTimeout(() => {
                 const userName = currentUser || 'Champion';
+                console.log('💬 Showing encouragement for:', userName);
                 alert(`Great choice, ${userName}! You're handling this craving like a champion! 💪`);
             }, 500);
         }
