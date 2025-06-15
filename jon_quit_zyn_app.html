@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quit Zyn Journey</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+
+        .setup-screen {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            text-align: center;
+        }
+
+        .main-screen {
+            display: none;
+        }
+
+        .setup-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            width: 100%;
+            max-width: 300px;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .form-group input {
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+        }
+
+        .start-btn {
+            background: linear-gradient(45deg, #ff6b6b, #ff8e53);
+            border: none;
+            padding: 15px 40px;
+            border-radius: 25px;
+            color: white;
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+        }
+
+        .start-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 107, 107, 0.6);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #ff6b6b, #ffd93d);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-label {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin-bottom: 5px;
+        }
+
+        .stat-detail {
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+
+        .milestones {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            margin-bottom: 30px;
+        }
+
+        .milestones h3 {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+
+        .milestone {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .milestone.achieved {
+            background: rgba(76, 175, 80, 0.3);
+            border-left: 4px solid #4caf50;
+        }
+
+        .milestone.current {
+            background: rgba(255, 193, 7, 0.3);
+            border-left: 4px solid #ffc107;
+            transform: scale(1.02);
+        }
+
+        .milestone-icon {
+            font-size: 2rem;
+            margin-right: 15px;
+            width: 50px;
+            text-align: center;
+        }
+
+        .milestone-content {
+            flex: 1;
+        }
+
+        .milestone-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .milestone-description {
+            opacity: 0.8;
+            font-size: 0.9rem;
+        }
+
+        .motivation-section {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .motivation-quote {
+            font-size: 1.3rem;
+            font-style: italic;
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+
+        .craving-help {
+            background: rgba(255, 107, 107, 0.2);
+            border: 2px solid rgba(255, 107, 107, 0.5);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .craving-btn {
+            background: linear-gradient(45deg, #ff6b6b, #ff8e53);
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 15px;
+            width: 100%;
+        }
+
+        .craving-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+        }
+
+        .coping-strategies {
+            display: none;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+
+        .strategy {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .strategy:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateX(5px);
+        }
+
+        .reset-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .reset-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .progress-bar {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            height: 20px;
+            margin: 10px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background: linear-gradient(45deg, #4caf50, #8bc34a);
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.5s ease;
+            position: relative;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.2) 50%, transparent 70%);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        @media (max-width: 768px) {
+            .title {
+                font-size: 2rem;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .container {
+                padding: 0 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 class="title">💪 Quit Journey</h1>
+            <p class="subtitle">Breaking free from Zyn, one day at a time</p>
+        </div>
+
+        <div class="setup-screen" id="setupScreen">
+            <h2 style="margin-bottom: 20px;">Let's Get Started!</h2>
+            <p style="margin-bottom: 30px; opacity: 0.9;">Tell us about yourself and your quit date to track your amazing progress.</p>
+            
+            <div class="setup-form">
+                <div class="form-group">
+                    <label for="userName">What's your name?</label>
+                    <input type="text" id="userName" placeholder="e.g., Jon" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="quitDate">When did you quit?</label>
+                    <input type="date" id="quitDate" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="dailyUsage">How many Zyns per day were you using?</label>
+                    <input type="number" id="dailyUsage" placeholder="e.g., 10" min="1" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="costPerPack">Cost per pack ($)</label>
+                    <input type="number" id="costPerPack" placeholder="e.g., 6.50" step="0.01" min="0" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="zynsPerPack">Zyns per pack</label>
+                    <input type="number" id="zynsPerPack" placeholder="e.g., 15" min="1" required>
+                </div>
+                
+                <button class="start-btn" onclick="startTracking()">Start My Journey! 🚀</button>
+                
+                <div style="margin-top: 20px; opacity: 0.8; font-size: 0.9rem;">
+                    <p>Already started? <button class="reset-btn" onclick="loadExistingUser()" style="display: inline; margin: 0; padding: 5px 10px;">Load My Progress</button></p>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-screen" id="mainScreen">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number" id="daysFree">0</div>
+                    <div class="stat-label">Days Zyn-Free</div>
+                    <div class="stat-detail">Keep going strong!</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-number" id="moneySaved">$0</div>
+                    <div class="stat-label">Money Saved</div>
+                    <div class="stat-detail" id="moneySavedDetail">Treat yourself!</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-number" id="zynsAvoided">0</div>
+                    <div class="stat-label">Zyns Not Used</div>
+                    <div class="stat-detail">Your body thanks you</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-number" id="hoursClean">0</div>
+                    <div class="stat-label">Hours Clean</div>
+                    <div class="stat-detail">Every hour counts</div>
+                </div>
+            </div>
+
+            <div class="milestones">
+                <h3>🏆 Your Achievement Milestones</h3>
+                <div id="milestonesList"></div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                </div>
+                <div style="text-align: center; margin-top: 10px; opacity: 0.8;" id="progressText">Progress to next milestone</div>
+            </div>
+
+            <div class="craving-help">
+                <h3>😤 Having a Craving?</h3>
+                <p style="margin-bottom: 15px;">It's normal! Click below for instant help strategies.</p>
+                <button class="craving-btn" onclick="toggleCopingStrategies()">Get Help Now!</button>
+                
+                <div class="coping-strategies" id="copingStrategies">
+                    <div class="strategy" onclick="selectStrategy(this)">🫁 Take 10 deep breaths slowly</div>
+                    <div class="strategy" onclick="selectStrategy(this)">🚶 Go for a 5-minute walk</div>
+                    <div class="strategy" onclick="selectStrategy(this)">💧 Drink a large glass of water</div>
+                    <div class="strategy" onclick="selectStrategy(this)">🎵 Listen to your favorite song</div>
+                    <div class="strategy" onclick="selectStrategy(this)">📱 Call or text a supportive friend</div>
+                    <div class="strategy" onclick="selectStrategy(this)">🧘 Do a 2-minute meditation</div>
+                    <div class="strategy" onclick="selectStrategy(this)">🍎 Eat a healthy snack</div>
+                    <div class="strategy" onclick="selectStrategy(this)">✋ Count to 100 slowly</div>
+                </div>
+            </div>
+
+            <div class="motivation-section">
+                <div class="motivation-quote" id="motivationQuote">
+                    "Every moment you resist is a victory. You're stronger than any craving!"
+                </div>
+                <button class="craving-btn" onclick="newMotivationQuote()" style="width: auto; padding: 10px 20px; font-size: 1rem;">New Quote</button>
+            </div>
+
+            <div style="text-align: center;">
+                <p style="margin-bottom: 10px; opacity: 0.8;">Logged in as: <strong id="currentUserName"></strong></p>
+                <button class="reset-btn" onclick="resetProgress()">Reset Progress</button>
+                <button class="reset-btn" onclick="switchUser()" style="margin-left: 10px;">Switch User</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/supabase/2.39.0/supabase.min.js"></script>
+    <script>
+        // ⚠️ REPLACE THESE WITH YOUR ACTUAL SUPABASE CREDENTIALS ⚠️
+        const SUPABASE_URL = 'https://frwtmvicerolhnseavat.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZyd3RtdmljZXJvbGhuc2VhdmF0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk5NDY3MjksImV4cCI6MjA2NTUyMjcyOX0.r0ldPbNANCrE-vaXuCnyixoFl8G8noil7lOoK85mM-0';
+        
+        // Initialize Supabase client
+        let supabase;
+        try {
+            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        } catch (error) {
+            console.log('Supabase not connected - using demo mode');
+        }
+
+        const motivationalQuotes = [
+            "Every moment you resist is a victory. You're stronger than any craving!",
+            "You're not just quitting Zyn - you're choosing freedom!",
+            "Your future self will thank you for the strength you're showing today.",
+            "Cravings are temporary, but your freedom is permanent.",
+            "You've already proven you can do this - look how far you've come!",
+            "Every day without Zyn is a day you're investing in your health.",
+            "You're breaking chains that once held you back. Keep going!",
+            "The hardest battles are fought in your mind - and you're winning!",
+            "Your willpower is stronger than any addiction. Believe in yourself!",
+            "Each craving you overcome makes you stronger for the next one."
+        ];
+
+        const milestones = [
+            { days: 1, icon: '🌟', title: 'First Day Free!', description: 'You took the hardest step!' },
+            { days: 3, icon: '💪', title: '3 Days Strong', description: 'Nicotine is leaving your system' },
+            { days: 7, icon: '🔥', title: 'One Week Warrior', description: 'Your taste and smell are improving' },
+            { days: 14, icon: '🚀', title: 'Two Week Champion', description: 'Circulation is getting better' },
+            { days: 30, icon: '👑', title: 'Monthly Master', description: 'Incredible willpower displayed!' },
+            { days: 60, icon: '🏆', title: 'Two Month Hero', description: 'Habit patterns are breaking' },
+            { days: 90, icon: '💎', title: 'Three Month Legend', description: 'Major milestone achieved!' },
+            { days: 180, icon: '🌈', title: 'Six Month Superstar', description: 'Your health has significantly improved' },
+            { days: 365, icon: '🎉', title: 'One Year Free!', description: 'You are officially Zyn-free!' }
+        ];
+
+        let quitData = null;
+        let currentUser = null;
+
+        // Supabase functions
+        async function saveUserData(userData) {
+            if (!supabase) {
+                console.log('Demo mode: would save', userData);
+                return { success: true };
+            }
+
+            try {
+                const { data, error } = await supabase
+                    .from('quit_tracking')
+                    .upsert({
+                        user_name: userData.userName,
+                        quit_date: userData.quitDate.toISOString().split('T')[0],
+                        daily_usage: userData.dailyUsage,
+                        cost_per_pack: userData.costPerPack,
+                        zyns_per_pack: userData.zynsPerPack
+                    }, {
+                        onConflict: 'user_name'
+                    });
+
+                if (error) throw error;
+                return { success: true, data };
+            } catch (error) {
+                console.error('Error saving data:', error);
+                return { success: false, error };
+            }
+        }
+
+        async function loadUserData(userName) {
+            if (!supabase) {
+                console.log('Demo mode: would load data for', userName);
+                return null;
+            }
+
+            try {
+                const { data, error } = await supabase
+                    .from('quit_tracking')
+                    .select('*')
+                    .eq('user_name', userName)
+                    .single();
+
+                if (error && error.code !== 'PGRST116') throw error; // PGRST116 = no rows found
+                return data;
+            } catch (error) {
+                console.error('Error loading data:', error);
+                return null;
+            }
+        }
+
+        // App functions
+        async function startTracking() {
+        async function startTracking() {
+            const userName = document.getElementById('userName').value.trim();
+            const quitDate = document.getElementById('quitDate').value;
+            const dailyUsage = parseInt(document.getElementById('dailyUsage').value);
+            const costPerPack = parseFloat(document.getElementById('costPerPack').value);
+            const zynsPerPack = parseInt(document.getElementById('zynsPerPack').value);
+
+            if (!userName || !quitDate || !dailyUsage || !costPerPack || !zynsPerPack) {
+                alert('Please fill in all fields to get started!');
+                return;
+            }
+
+            quitData = {
+                userName: userName,
+                quitDate: new Date(quitDate),
+                dailyUsage: dailyUsage,
+                costPerPack: costPerPack,
+                zynsPerPack: zynsPerPack,
+                costPerZyn: costPerPack / zynsPerPack
+            };
+
+            // Save to Supabase
+            const result = await saveUserData(quitData);
+            if (!result.success) {
+                alert('Error saving your data. Please try again.');
+                return;
+            }
+
+            currentUser = userName;
+            document.getElementById('currentUserName').textContent = userName;
+            
+            document.getElementById('setupScreen').style.display = 'none';
+            document.getElementById('mainScreen').style.display = 'block';
+            
+            updateStats();
+            updateMilestones();
+            setInterval(updateStats, 60000); // Update every minute
+        }
+
+        async function loadExistingUser() {
+            const userName = prompt('Enter your name to load your progress:');
+            if (!userName) return;
+
+            const userData = await loadUserData(userName.trim());
+            
+            if (!userData) {
+                alert(`No progress found for "${userName}". Please check the spelling or start a new journey.`);
+                return;
+            }
+
+            quitData = {
+                userName: userData.user_name,
+                quitDate: new Date(userData.quit_date),
+                dailyUsage: userData.daily_usage,
+                costPerPack: userData.cost_per_pack,
+                zynsPerPack: userData.zyns_per_pack,
+                costPerZyn: userData.cost_per_pack / userData.zyns_per_pack
+            };
+
+            currentUser = userData.user_name;
+            document.getElementById('currentUserName').textContent = userData.user_name;
+            
+            document.getElementById('setupScreen').style.display = 'none';
+            document.getElementById('mainScreen').style.display = 'block';
+            
+            updateStats();
+            updateMilestones();
+            setInterval(updateStats, 60000);
+        }
+
+        function switchUser() {
+            quitData = null;
+            currentUser = null;
+            document.getElementById('mainScreen').style.display = 'none';
+            document.getElementById('setupScreen').style.display = 'block';
+            
+            // Clear form
+            document.getElementById('userName').value = '';
+            document.getElementById('quitDate').value = '';
+            document.getElementById('dailyUsage').value = '';
+            document.getElementById('costPerPack').value = '';
+            document.getElementById('zynsPerPack').value = '';
+        }
+        }
+
+        function updateStats() {
+            if (!quitData) return;
+
+            const now = new Date();
+            const timeDiff = now - quitData.quitDate;
+            const daysFree = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+            const hoursFree = Math.floor(timeDiff / (1000 * 60 * 60));
+            
+            const zynsAvoided = daysFree * quitData.dailyUsage;
+            const moneySaved = zynsAvoided * quitData.costPerZyn;
+
+            document.getElementById('daysFree').textContent = Math.max(0, daysFree);
+            document.getElementById('hoursClean').textContent = Math.max(0, hoursFree);
+            document.getElementById('zynsAvoided').textContent = Math.max(0, zynsAvoided);
+            document.getElementById('moneySaved').textContent = '$' + Math.max(0, moneySaved).toFixed(2);
+
+            // Update money saved detail
+            const moneyDetail = document.getElementById('moneySavedDetail');
+            if (moneySaved >= 100) {
+                moneyDetail.textContent = 'Nice dinner out!';
+            } else if (moneySaved >= 50) {
+                moneyDetail.textContent = 'New video game!';
+            } else if (moneySaved >= 20) {
+                moneyDetail.textContent = 'Coffee for a week!';
+            } else {
+                moneyDetail.textContent = 'Every dollar counts!';
+            }
+
+            updateMilestones();
+        }
+
+        function updateMilestones() {
+            if (!quitData) return;
+
+            const now = new Date();
+            const daysFree = Math.max(0, Math.floor((now - quitData.quitDate) / (1000 * 60 * 60 * 24)));
+            
+            const milestonesList = document.getElementById('milestonesList');
+            milestonesList.innerHTML = '';
+
+            let nextMilestone = null;
+            let progress = 0;
+
+            milestones.forEach((milestone, index) => {
+                const milestoneEl = document.createElement('div');
+                milestoneEl.className = 'milestone';
+                
+                if (daysFree >= milestone.days) {
+                    milestoneEl.classList.add('achieved');
+                } else if (!nextMilestone) {
+                    nextMilestone = milestone;
+                    milestoneEl.classList.add('current');
+                    progress = (daysFree / milestone.days) * 100;
+                }
+
+                milestoneEl.innerHTML = `
+                    <div class="milestone-icon">${milestone.icon}</div>
+                    <div class="milestone-content">
+                        <div class="milestone-title">${milestone.title}</div>
+                        <div class="milestone-description">${milestone.description}</div>
+                    </div>
+                `;
+
+                milestonesList.appendChild(milestoneEl);
+            });
+
+            // Update progress bar
+            const progressFill = document.getElementById('progressFill');
+            const progressText = document.getElementById('progressText');
+            
+            if (nextMilestone) {
+                progressFill.style.width = Math.min(progress, 100) + '%';
+                const daysLeft = nextMilestone.days - daysFree;
+                progressText.textContent = `${daysLeft} days until ${nextMilestone.title}`;
+            } else {
+                progressFill.style.width = '100%';
+                progressText.textContent = 'All milestones achieved! You\'re amazing!';
+            }
+        }
+
+        function toggleCopingStrategies() {
+            const strategies = document.getElementById('copingStrategies');
+            strategies.style.display = strategies.style.display === 'none' ? 'block' : 'none';
+        }
+
+        function selectStrategy(element) {
+            element.style.background = 'rgba(76, 175, 80, 0.3)';
+            element.style.transform = 'scale(1.05)';
+            
+            setTimeout(() => {
+                element.style.background = 'rgba(255, 255, 255, 0.1)';
+                element.style.transform = 'translateX(5px)';
+            }, 1000);
+
+            // Show encouragement
+            setTimeout(() => {
+                const userName = currentUser || 'Champion';
+                alert(`Great choice, ${userName}! You're handling this craving like a champion! 💪`);
+            }, 500);
+        }
+
+        function newMotivationQuote() {
+            const quoteEl = document.getElementById('motivationQuote');
+            const randomQuote = motivationalQuotes[Math.floor(Math.random() * motivationalQuotes.length)];
+            quoteEl.textContent = randomQuote;
+        }
+
+        function resetProgress() {
+            const userName = currentUser || 'your';
+            if (confirm(`Are you sure you want to reset ${userName}'s progress? This cannot be undone.`)) {
+                // Note: In a real app, you might want to delete from Supabase here
+                quitData = null;
+                currentUser = null;
+                document.getElementById('mainScreen').style.display = 'none';
+                document.getElementById('setupScreen').style.display = 'block';
+                
+                // Clear form
+                document.getElementById('userName').value = '';
+                document.getElementById('quitDate').value = '';
+                document.getElementById('dailyUsage').value = '';
+                document.getElementById('costPerPack').value = '';
+                document.getElementById('zynsPerPack').value = '';
+            }
+        }
+
+        // Set default quit date to today
+        document.getElementById('quitDate').valueAsDate = new Date();
+    </script>
+</body>
+</html>
