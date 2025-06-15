@@ -367,7 +367,7 @@
                     <input type="number" id="zynsPerPack" placeholder="e.g., 15" min="1" required>
                 </div>
                 
-                <button class="start-btn" onclick="startTracking(); return false;">Start My Journey! 🚀</button>
+                <button class="start-btn" onclick="startTracking()">Start My Journey! 🚀</button>
                 
                 <div style="margin-top: 20px; opacity: 0.8; font-size: 0.9rem;">
                     <p>Already started? <button class="reset-btn" onclick="loadExistingUser()" style="display: inline; margin: 0; padding: 5px 10px;">Load My Progress</button></p>
@@ -445,40 +445,20 @@
 
     <script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
     <script>
-        // ⚠️ REPLACE THESE WITH YOUR ACTUAL SUPABASE CREDENTIALS ⚠️
+        // Supabase configuration
         const SUPABASE_URL = 'https://frwtmvicerolhnseavat.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZyd3RtdmljZXJvbGhuc2VhdmF0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk5NDY3MjksImV4cCI6MjA2NTUyMjcyOX0.r0ldPbNANCrE-vaXuCnyixoFl8G8noil7lOoK85mM-0';
         
-        // Initialize Supabase client with better error handling
+        // Initialize Supabase
         let supabase = null;
-        
-        // Wait for DOM and try multiple ways to load Supabase
-        document.addEventListener('DOMContentLoaded', function() {
-            setTimeout(() => {
-                try {
-                    // Try different ways Supabase might be available
-                    if (window.supabase && window.supabase.createClient) {
-                        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-                        console.log('✅ Supabase connected via window.supabase!');
-                    } else if (window.Supabase && window.Supabase.createClient) {
-                        supabase = window.Supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-                        console.log('✅ Supabase connected via window.Supabase!');
-                    } else if (typeof createClient !== 'undefined') {
-                        supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-                        console.log('✅ Supabase connected via global createClient!');
-                    } else {
-                        console.log('❌ Supabase library not loaded - using demo mode');
-                        console.log('Available on window:', Object.keys(window).filter(k => k.toLowerCase().includes('supabase')));
-                    }
-                } catch (error) {
-                    console.error('❌ Supabase connection error:', error);
-                    console.log('Using demo mode');
-                }
-                
-                // Set default quit date to today
-                document.getElementById('quitDate').valueAsDate = new Date();
-            }, 100); // Small delay to let Supabase load
-        });
+        try {
+            if (window.supabase) {
+                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                console.log('✅ Supabase connected!');
+            }
+        } catch (error) {
+            console.log('Supabase not available, using demo mode');
+        }
 
         const motivationalQuotes = [
             "Every moment you resist is a victory. You're stronger than any craving!",
@@ -511,7 +491,7 @@
         // Supabase functions
         async function saveUserData(userData) {
             if (!supabase) {
-                console.log('Demo mode: would save', userData);
+                console.log('Demo mode: data would be saved');
                 return { success: true };
             }
 
@@ -538,7 +518,7 @@
 
         async function loadUserData(userName) {
             if (!supabase) {
-                console.log('Demo mode: would load data for', userName);
+                console.log('Demo mode: no saved data available');
                 return null;
             }
 
@@ -549,7 +529,7 @@
                     .eq('user_name', userName)
                     .single();
 
-                if (error && error.code !== 'PGRST116') throw error; // PGRST116 = no rows found
+                if (error && error.code !== 'PGRST116') throw error;
                 return data;
             } catch (error) {
                 console.error('Error loading data:', error);
@@ -557,9 +537,9 @@
             }
         }
 
-        // App functions
-        async function startTracking() {
-        async function startTracking() {
+        function startTracking() {
+            console.log('startTracking called!');
+            
             const userName = document.getElementById('userName').value.trim();
             const quitDate = document.getElementById('quitDate').value;
             const dailyUsage = parseInt(document.getElementById('dailyUsage').value);
@@ -580,18 +560,17 @@
                 costPerZyn: costPerPack / zynsPerPack
             };
 
-            console.log('✅ Saving data to Supabase...');
-            
-            // Save to Supabase
-            const result = await saveUserData(quitData);
-            console.log('Save result:', result);
-            
-            if (!result.success) {
-                alert('Error saving your data. Please try again.');
-                return;
+            // Save to Supabase (async but don't wait)
+            if (supabase) {
+                saveUserData(quitData).then(result => {
+                    if (result.success) {
+                        console.log('Data saved to Supabase!');
+                    } else {
+                        console.log('Failed to save to Supabase, but continuing...');
+                    }
+                });
             }
 
-            console.log('✅ Data saved successfully!');
             currentUser = userName;
             document.getElementById('currentUserName').textContent = userName;
             
@@ -600,7 +579,7 @@
             
             updateStats();
             updateMilestones();
-            setInterval(updateStats, 60000); // Update every minute
+            setInterval(updateStats, 60000);
         }
 
         async function loadExistingUser() {
@@ -646,7 +625,6 @@
             document.getElementById('dailyUsage').value = '';
             document.getElementById('costPerPack').value = '';
             document.getElementById('zynsPerPack').value = '';
-        }
         }
 
         function updateStats() {
@@ -743,7 +721,6 @@
                 element.style.transform = 'translateX(5px)';
             }, 1000);
 
-            // Show encouragement
             setTimeout(() => {
                 const userName = currentUser || 'Champion';
                 alert(`Great choice, ${userName}! You're handling this craving like a champion! 💪`);
@@ -759,7 +736,6 @@
         function resetProgress() {
             const userName = currentUser || 'your';
             if (confirm(`Are you sure you want to reset ${userName}'s progress? This cannot be undone.`)) {
-                // Note: In a real app, you might want to delete from Supabase here
                 quitData = null;
                 currentUser = null;
                 document.getElementById('mainScreen').style.display = 'none';
